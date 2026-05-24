@@ -1,0 +1,1143 @@
+#include <iostream>
+using namespace std;
+
+struct Pemain {
+    int id;
+    char nama[50];
+    int idKlub;
+    int skor;
+    int rating;
+};
+
+struct Klub {
+    int id;
+    char nama[50];
+    int totalPoin;
+};
+
+struct Pertandingan {
+    int id;
+    int ronde;
+    int idPemain1;
+    int idPemain2;
+    int hasil; 
+    int idKlub1;
+    int idKlub2;
+};
+
+bool bandingString(const char* a, const char* b) {
+    int i = 0;
+    while (a[i] != '\0' && b[i] != '\0') {
+        if (a[i] != b[i]) return false;
+        i++;
+    }
+    return (a[i] == '\0' && b[i] == '\0');
+}
+
+struct NodeKlub {
+    Klub* data;
+    NodeKlub* next;
+};
+
+struct LinkedListKlub {
+    NodeKlub* kepala;
+    int ukuran;
+};
+
+void initListKlub(LinkedListKlub* list) {
+    list->kepala = nullptr;
+    list->ukuran = 0;
+}
+
+void tambahKlubBelakang(LinkedListKlub* list, Klub* val) {
+    NodeKlub* newNode = new NodeKlub;
+    newNode->data = val;
+    newNode->next = nullptr;
+    if (!list->kepala) {
+        list->kepala = newNode;
+    } else {
+        NodeKlub* cur = list->kepala;
+        while (cur->next) cur = cur->next;
+        cur->next = newNode;
+    }
+    list->ukuran++;
+}
+
+NodeKlub* getKepalaKlub(LinkedListKlub* list) {
+    return list->kepala;
+}
+
+int getUkuranKlub(LinkedListKlub* list) {
+    return list->ukuran;
+}
+
+struct NodePemain {
+    Pemain* data;
+    NodePemain* next;
+};
+
+struct LinkedListPemain {
+    NodePemain* kepala;
+    int ukuran;
+};
+
+void initListPemain(LinkedListPemain* list) {
+    list->kepala = nullptr;
+    list->ukuran = 0;
+}
+
+void tambahPemainBelakang(LinkedListPemain* list, Pemain* val) {
+    NodePemain* newNode = new NodePemain;
+    newNode->data = val;
+    newNode->next = nullptr;
+    if (!list->kepala) {
+        list->kepala = newNode;
+    } else {
+        NodePemain* cur = list->kepala;
+        while (cur->next) cur = cur->next;
+        cur->next = newNode;
+    }
+    list->ukuran++;
+}
+
+void hapusPemainById(LinkedListPemain* list, int id) {
+    NodePemain* prev = nullptr;
+    NodePemain* cur = list->kepala;
+    while (cur) {
+        if (cur->data->id == id) {
+            if (prev) prev->next = cur->next;
+            else list->kepala = cur->next;
+            delete cur->data;
+            delete cur;
+            list->ukuran--;
+            return;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+}
+
+NodePemain* getKepalaPemain(LinkedListPemain* list) {
+    return list->kepala;
+}
+
+int getUkuranPemain(LinkedListPemain* list) {
+    return list->ukuran;
+}
+
+struct NodePertandingan {
+    Pertandingan* data;
+    NodePertandingan* next;
+};
+
+struct LinkedListPertandingan {
+    NodePertandingan* kepala;
+    int ukuran;
+};
+
+void initListPertandingan(LinkedListPertandingan* list) {
+    list->kepala = nullptr;
+    list->ukuran = 0;
+}
+
+void tambahPertandinganBelakang(LinkedListPertandingan* list, Pertandingan* val) {
+    NodePertandingan* newNode = new NodePertandingan;
+    newNode->data = val;
+    newNode->next = nullptr;
+    if (!list->kepala) {
+        list->kepala = newNode;
+    } else {
+        NodePertandingan* cur = list->kepala;
+        while (cur->next) cur = cur->next;
+        cur->next = newNode;
+    }
+    list->ukuran++;
+}
+
+void hapusPertandinganById(LinkedListPertandingan* list, int id) {
+    NodePertandingan* prev = nullptr;
+    NodePertandingan* cur = list->kepala;
+    while (cur) {
+        if (cur->data->id == id) {
+            if (prev) prev->next = cur->next;
+            else list->kepala = cur->next;
+            delete cur->data;
+            delete cur;
+            list->ukuran--;
+            return;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+}
+
+NodePertandingan* getKepalaPertandingan(LinkedListPertandingan* list) {
+    return list->kepala;
+}
+
+int getUkuranPertandingan(LinkedListPertandingan* list) {
+    return list->ukuran;
+}
+
+struct StackPertandingan {
+    LinkedListPertandingan list;
+};
+
+void initStack(StackPertandingan* s) {
+    initListPertandingan(&s->list);
+}
+
+void pushStack(StackPertandingan* s, Pertandingan* val) {
+    NodePertandingan* newNode = new NodePertandingan;
+    newNode->data = val;
+    newNode->next = s->list.kepala;
+    s->list.kepala = newNode;
+    s->list.ukuran++;
+}
+
+Pertandingan* popStack(StackPertandingan* s) {
+    if (!s->list.kepala) return nullptr;
+    NodePertandingan* temp = s->list.kepala;
+    Pertandingan* val = temp->data;
+    s->list.kepala = s->list.kepala->next;
+    delete temp;
+    s->list.ukuran--;
+    return val;
+}
+
+int stackKosong(StackPertandingan* s) {
+    return s->list.ukuran == 0;
+}
+
+struct QueuePertandingan {
+    LinkedListPertandingan list;
+};
+
+void initQueue(QueuePertandingan* q) {
+    initListPertandingan(&q->list);
+}
+
+void enqueue(QueuePertandingan* q, Pertandingan* val) {
+    tambahPertandinganBelakang(&q->list, val);
+}
+
+Pertandingan* dequeue(QueuePertandingan* q) {
+    if (!q->list.kepala) return nullptr;
+    NodePertandingan* temp = q->list.kepala;
+    Pertandingan* val = temp->data;
+    q->list.kepala = q->list.kepala->next;
+    delete temp;
+    q->list.ukuran--;
+    return val;
+}
+
+int queueKosong(QueuePertandingan* q) {
+    return q->list.ukuran == 0;
+}
+
+int getUkuranQueue(QueuePertandingan* q) {
+    return q->list.ukuran;
+}
+
+const int UKURAN_HASH = 101;
+
+struct HashNode {
+    int kunci;
+    Pemain* nilai;
+    HashNode* next;
+};
+
+struct LinkedListHash {
+    HashNode* kepala;
+};
+
+void initListHash(LinkedListHash* list) {
+    list->kepala = nullptr;
+}
+
+void tambahHash(LinkedListHash* list, int kunci, Pemain* pemain) {
+    HashNode* newNode = new HashNode;
+    newNode->kunci = kunci;
+    newNode->nilai = pemain;
+    newNode->next = list->kepala;
+    list->kepala = newNode;
+}
+
+Pemain* cariHash(LinkedListHash* list, int kunci) {
+    HashNode* cur = list->kepala;
+    while (cur) {
+        if (cur->kunci == kunci) return cur->nilai;
+        cur = cur->next;
+    }
+    return nullptr;
+}
+
+bool hapusHash(LinkedListHash* list, int kunci) {
+    HashNode* prev = nullptr;
+    HashNode* cur = list->kepala;
+    while (cur) {
+        if (cur->kunci == kunci) {
+            if (prev) prev->next = cur->next;
+            else list->kepala = cur->next;
+            delete cur;
+            return true;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+    return false;
+}
+
+struct HashTable {
+    LinkedListHash tabel[UKURAN_HASH];
+};
+
+void initHashTable(HashTable* ht) {
+    for (int i = 0; i < UKURAN_HASH; i++) {
+        initListHash(&ht->tabel[i]);
+    }
+}
+
+int hashing(int kunci) {
+    return kunci % UKURAN_HASH;
+}
+
+void hashSisip(HashTable* ht, int kunci, Pemain* pemain) {
+    int idx = hashing(kunci);
+    tambahHash(&ht->tabel[idx], kunci, pemain);
+}
+
+Pemain* hashCari(HashTable* ht, int kunci) {
+    int idx = hashing(kunci);
+    return cariHash(&ht->tabel[idx], kunci);
+}
+
+void hashHapus(HashTable* ht, int kunci) {
+    int idx = hashing(kunci);
+    hapusHash(&ht->tabel[idx], kunci);
+}
+
+struct BSTNode {
+    Pemain* data;
+    BSTNode* kiri;
+    BSTNode* kanan;
+};
+
+BSTNode* buatBSTNode(Pemain* p) {
+    BSTNode* node = new BSTNode;
+    node->data = p;
+    node->kiri = nullptr;
+    node->kanan = nullptr;
+    return node;
+}
+
+BSTNode* bstSisipRekursif(BSTNode* node, Pemain* p) {
+    if (!node) return buatBSTNode(p);
+    if (p->rating < node->data->rating)
+        node->kiri = bstSisipRekursif(node->kiri, p);
+    else
+        node->kanan = bstSisipRekursif(node->kanan, p);
+    return node;
+}
+
+void bstInorderRekursif(BSTNode* node, void (*kunjungi)(Pemain*)) {
+    if (!node) return;
+    bstInorderRekursif(node->kiri, kunjungi);
+    kunjungi(node->data);
+    bstInorderRekursif(node->kanan, kunjungi);
+}
+
+Pemain* bstCariRekursif(BSTNode* node, int rating) {
+    if (!node) return nullptr;
+    if (rating == node->data->rating) return node->data;
+    else if (rating < node->data->rating) return bstCariRekursif(node->kiri, rating);
+    else return bstCariRekursif(node->kanan, rating);
+}
+
+int bstKedalamanMaksRekursif(BSTNode* node) {
+    if (!node) return 0;
+    int kiri = bstKedalamanMaksRekursif(node->kiri);
+    int kanan = bstKedalamanMaksRekursif(node->kanan);
+    return (kiri > kanan ? kiri : kanan) + 1;
+}
+
+struct NodeInt {
+    int data;
+    NodeInt* next;
+};
+
+struct LinkedListInt {
+    NodeInt* kepala;
+};
+
+void initListInt(LinkedListInt* list) {
+    list->kepala = nullptr;
+}
+
+void tambahIntBelakang(LinkedListInt* list, int val) {
+    NodeInt* newNode = new NodeInt;
+    newNode->data = val;
+    newNode->next = nullptr;
+    if (!list->kepala) {
+        list->kepala = newNode;
+    } else {
+        NodeInt* cur = list->kepala;
+        while (cur->next) cur = cur->next;
+        cur->next = newNode;
+    }
+}
+
+struct Graph {
+    LinkedListInt adj[100];
+};
+
+void initGraph(Graph* g) {
+    for (int i = 0; i < 100; i++) {
+        initListInt(&g->adj[i]);
+    }
+}
+
+void graphTambahSisi(Graph* g, int u, int v) {
+    tambahIntBelakang(&g->adj[u], v);
+    tambahIntBelakang(&g->adj[v], u);
+}
+
+void graphDfsRekursif(Graph* g, int v, bool dikunjungi[], void (*kunjungi)(int)) {
+    dikunjungi[v] = true;
+    kunjungi(v);
+    NodeInt* cur = g->adj[v].kepala;
+    while (cur) {
+        if (!dikunjungi[cur->data])
+            graphDfsRekursif(g, cur->data, dikunjungi, kunjungi);
+        cur = cur->next;
+    }
+}
+
+void graphKomponenTerhubung(Graph* g, void (*kunjungi)(int)) {
+    bool dikunjungi[100] = {false};
+    for (int i = 0; i < 100; i++) {
+        if (!dikunjungi[i] && g->adj[i].kepala != nullptr) {
+            graphDfsRekursif(g, i, dikunjungi, kunjungi);
+            cout << endl;
+        }
+    }
+}
+
+void tukarPemain(Pemain** a, Pemain** b) {
+    Pemain* temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partisiPemain(Pemain** arr, int rendah, int tinggi) {
+    int pivot = arr[tinggi]->skor;
+    int i = rendah - 1;
+    for (int j = rendah; j < tinggi; j++) {
+        if (arr[j]->skor >= pivot) {
+            i++;
+            tukarPemain(&arr[i], &arr[j]);
+        }
+    }
+    tukarPemain(&arr[i+1], &arr[tinggi]);
+    return i+1;
+}
+
+void quickSortPemain(Pemain** arr, int rendah, int tinggi) {
+    if (rendah < tinggi) {
+        int pi = partisiPemain(arr, rendah, tinggi);
+        quickSortPemain(arr, rendah, pi-1);
+        quickSortPemain(arr, pi+1, tinggi);
+    }
+}
+
+int binarySearchPemain(Pemain** arr, int n, int targetRating) {
+    int kiri = 0, kanan = n-1;
+    while (kiri <= kanan) {
+        int tengah = kiri + (kanan - kiri)/2;
+        if (arr[tengah]->rating == targetRating) return tengah;
+        else if (arr[tengah]->rating < targetRating) kiri = tengah+1;
+        else kanan = tengah-1;
+    }
+    return -1;
+}
+
+LinkedListKlub daftarKlub;
+LinkedListPemain daftarPemain;
+LinkedListPertandingan daftarPertandingan;
+HashTable hashTabelPemain;
+BSTNode* bstAkar = nullptr;
+Graph graphKlub;
+StackPertandingan riwayatPertandingan;
+QueuePertandingan antrianPertandingan;
+
+int nextIdKlub = 1;
+int nextIdPemain = 1;
+int nextIdPertandingan = 1;
+
+void cetakPemain(Pemain* p) {
+    cout << "ID: " << p->id << ", Nama: " << p->nama
+         << ", Klub ID: " << p->idKlub << ", Skor: " << p->skor
+         << ", Rating: " << p->rating << endl;
+}
+
+void cetakKlub(Klub* k) {
+    cout << "ID: " << k->id << ", Nama: " << k->nama
+         << ", Total Poin Klub: " << k->totalPoin << endl;
+}
+
+void cetakPertandingan(Pertandingan* m) {
+    cout << "ID: " << m->id << ", Ronde: " << m->ronde
+         << ", " << m->idPemain1 << " vs " << m->idPemain2 << " | Hasil: ";
+    if (m->hasil == 1) cout << "Pemain1 menang";
+    else if (m->hasil == 2) cout << "Pemain2 menang";
+    else if (m->hasil == 3) cout << "Seri";
+    else cout << "Belum dimainkan";
+    cout << endl;
+}
+
+void cetakNamaKlub(int idKlub) {
+    NodeKlub* cur = daftarKlub.kepala;
+    while (cur) {
+        if (cur->data->id == idKlub) {
+            cout << cur->data->nama << " ";
+            return;
+        }
+        cur = cur->next;
+    }
+}
+
+void perbaruiTotalPoinKlub(int idKlub) {
+    int total = 0;
+    NodePemain* cur = daftarPemain.kepala;
+    while (cur) {
+        if (cur->data->idKlub == idKlub) total += cur->data->skor;
+        cur = cur->next;
+    }
+    NodeKlub* ccur = daftarKlub.kepala;
+    while (ccur) {
+        if (ccur->data->id == idKlub) {
+            ccur->data->totalPoin = total;
+            return;
+        }
+        ccur = ccur->next;
+    }
+}
+
+bool cekKlubExist(int idKlub) {
+    NodeKlub* cur = daftarKlub.kepala;
+    while (cur) {
+        if (cur->data->id == idKlub) return true;
+        cur = cur->next;
+    }
+    return false;
+}
+
+void rebuildBST() {
+    bstAkar = nullptr;
+    NodePemain* cur = daftarPemain.kepala;
+    while (cur) {
+        bstAkar = bstSisipRekursif(bstAkar, cur->data);
+        cur = cur->next;
+    }
+}
+
+void tampilkanSemuaKlub() {
+    if (daftarKlub.ukuran == 0) {
+        cout << "Belum ada klub. Silakan tambah klub terlebih dahulu.\n";
+        return;
+    }
+    cout << "\n--- DAFTAR KLUB ---\n";
+    NodeKlub* cur = daftarKlub.kepala;
+    while (cur) {
+        cout << "ID: " << cur->data->id << " | Nama: " << cur->data->nama << endl;
+        cur = cur->next;
+    }
+}
+
+void tambahKlub() {
+    Klub* klubBaru = new Klub;
+    klubBaru->id = nextIdKlub++;
+    klubBaru->totalPoin = 0;
+    cout << "Masukkan nama klub: ";
+    cin.ignore();
+    cin.getline(klubBaru->nama, 50);
+    tambahKlubBelakang(&daftarKlub, klubBaru);
+    cout << "Klub berhasil ditambahkan! ID: " << klubBaru->id << endl;
+}
+
+void lihatKlub() {
+    if (daftarKlub.ukuran == 0) {
+        cout << "Belum ada klub.\n";
+        return;
+    }
+    cout << "\n===== DAFTAR KLUB =====\n";
+    NodeKlub* cur = daftarKlub.kepala;
+    while (cur) {
+        cetakKlub(cur->data);
+        cur = cur->next;
+    }
+}
+
+void editKlub() {
+    lihatKlub();
+    if (daftarKlub.ukuran == 0) return;
+    int id;
+    cout << "Masukkan ID klub yang akan diedit: ";
+    cin >> id;
+    NodeKlub* cur = daftarKlub.kepala;
+    while (cur) {
+        if (cur->data->id == id) {
+            cout << "Masukkan nama baru: ";
+            cin.ignore();
+            cin.getline(cur->data->nama, 50);
+            cout << "Data klub berhasil diubah.\n";
+            return;
+        }
+        cur = cur->next;
+    }
+    cout << "Klub tidak ditemukan.\n";
+}
+
+void hapusKlub() {
+    lihatKlub();
+    if (daftarKlub.ukuran == 0) return;
+    int id;
+    cout << "Masukkan ID klub yang akan dihapus: ";
+    cin >> id;
+    NodePemain* pCur = daftarPemain.kepala;
+    while (pCur) {
+        if (pCur->data->idKlub == id) {
+            cout << "Tidak bisa hapus klub karena masih ada pemain.\n";
+            return;
+        }
+        pCur = pCur->next;
+    }
+    NodeKlub* prev = nullptr;
+    NodeKlub* cur = daftarKlub.kepala;
+    while (cur) {
+        if (cur->data->id == id) {
+            if (prev) prev->next = cur->next;
+            else daftarKlub.kepala = cur->next;
+            delete cur->data;
+            delete cur;
+            daftarKlub.ukuran--;
+            cout << "Klub berhasil dihapus.\n";
+            return;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+    cout << "Klub tidak ditemukan.\n";
+}
+
+void tambahPemain() {
+    if (daftarKlub.ukuran == 0) {
+        cout << "Belum ada klub. Silakan tambah klub terlebih dahulu.\n";
+        return;
+    }
+    
+    tampilkanSemuaKlub();
+    
+    Pemain* pBaru = new Pemain;
+    pBaru->id = nextIdPemain++;
+    cout << "\nMasukkan nama pemain: ";
+    cin.ignore();
+    cin.getline(pBaru->nama, 50);
+    cout << "Masukkan rating pemain (0-3000): ";
+    cin >> pBaru->rating;
+    
+    int cid;
+    bool klubValid = false;
+    do {
+        cout << "Pilih ID klub dari daftar di atas: ";
+        cin >> cid;
+        if (cekKlubExist(cid)) {
+            klubValid = true;
+            NodeKlub* cur = daftarKlub.kepala;
+            while (cur) {
+                if (cur->data->id == cid) {
+                    cout << "Klub yang dipilih: " << cur->data->nama << " (ID: " << cid << ")\n";
+                    break;
+                }
+                cur = cur->next;
+            }
+        } else {
+            cout << "ID klub tidak valid. Silakan coba lagi.\n";
+        }
+    } while (!klubValid);
+    
+    pBaru->idKlub = cid;
+    pBaru->skor = 0;
+    tambahPemainBelakang(&daftarPemain, pBaru);
+    hashSisip(&hashTabelPemain, pBaru->id, pBaru);
+    bstAkar = bstSisipRekursif(bstAkar, pBaru);
+    perbaruiTotalPoinKlub(cid);
+    cout << "\nPemain berhasil ditambahkan!\n";
+    cout << "ID Pemain: " << pBaru->id << ", Nama: " << pBaru->nama << ", Klub: ";
+    NodeKlub* cur = daftarKlub.kepala;
+    while (cur) {
+        if (cur->data->id == cid) {
+            cout << cur->data->nama << endl;
+            break;
+        }
+        cur = cur->next;
+    }
+}
+
+void lihatPemain() {
+    if (daftarPemain.ukuran == 0) {
+        cout << "Belum ada pemain.\n";
+        return;
+    }
+    cout << "\n===== DAFTAR PEMAIN =====\n";
+    NodePemain* cur = daftarPemain.kepala;
+    while (cur) {
+       
+        cout << "ID: " << cur->data->id << ", Nama: " << cur->data->nama
+             << ", Klub: ";
+        NodeKlub* kcur = daftarKlub.kepala;
+        while (kcur) {
+            if (kcur->data->id == cur->data->idKlub) {
+                cout << kcur->data->nama;
+                break;
+            }
+            kcur = kcur->next;
+        }
+        cout << ", Skor: " << cur->data->skor << ", Rating: " << cur->data->rating << endl;
+        cur = cur->next;
+    }
+}
+
+void editPemain() {
+    lihatPemain();
+    if (daftarPemain.ukuran == 0) return;
+    int id;
+    cout << "ID pemain yang akan diedit: ";
+    cin >> id;
+    Pemain* p = hashCari(&hashTabelPemain, id);
+    if (!p) {
+        cout << "Pemain tidak ditemukan.\n";
+        return;
+    }
+    cout << "Nama baru: ";
+    cin.ignore();
+    cin.getline(p->nama, 50);
+    cout << "Rating baru: ";
+    cin >> p->rating;
+    rebuildBST();
+    cout << "Data pemain diubah.\n";
+}
+
+void hapusPemain() {
+    lihatPemain();
+    if (daftarPemain.ukuran == 0) return;
+    int id;
+    cout << "ID pemain yang akan dihapus: ";
+    cin >> id;
+    NodePertandingan* mCur = daftarPertandingan.kepala;
+    while (mCur) {
+        if ((mCur->data->idPemain1 == id || mCur->data->idPemain2 == id) && mCur->data->hasil == 0) {
+            cout << "Pemain masih memiliki pertandingan terjadwal.\n";
+            return;
+        }
+        mCur = mCur->next;
+    }
+    Pemain* p = hashCari(&hashTabelPemain, id);
+    if (!p) {
+        cout << "Pemain tidak ditemukan.\n";
+        return;
+    }
+    int idKlub = p->idKlub;
+    hapusPemainById(&daftarPemain, id);
+    hashHapus(&hashTabelPemain, id);
+    rebuildBST();
+    perbaruiTotalPoinKlub(idKlub);
+    cout << "Pemain berhasil dihapus.\n";
+}
+
+void tampilkanSemuaPemain() {
+    if (daftarPemain.ukuran == 0) {
+        cout << "Belum ada pemain.\n";
+        return;
+    }
+    cout << "\n--- DAFTAR PEMAIN ---\n";
+    NodePemain* cur = daftarPemain.kepala;
+    while (cur) {
+        cout << "ID: " << cur->data->id << " | Nama: " << cur->data->nama
+             << " | Klub: ";
+        NodeKlub* kcur = daftarKlub.kepala;
+        while (kcur) {
+            if (kcur->data->id == cur->data->idKlub) {
+                cout << kcur->data->nama;
+                break;
+            }
+            kcur = kcur->next;
+        }
+        cout << " | Rating: " << cur->data->rating << endl;
+        cur = cur->next;
+    }
+}
+
+void buatJadwal() {
+    if (daftarPemain.ukuran < 2) {
+        cout << "Minimal 2 pemain.\n";
+        return;
+    }
+    
+    tampilkanSemuaPemain();
+    
+    Pertandingan* ptg = new Pertandingan;
+    ptg->id = nextIdPertandingan++;
+    cout << "\nNomor ronde: ";
+    cin >> ptg->ronde;
+    cout << "Masukkan ID Pemain 1: ";
+    cin >> ptg->idPemain1;
+    cout << "Masukkan ID Pemain 2: ";
+    cin >> ptg->idPemain2;
+    
+    Pemain* p1 = hashCari(&hashTabelPemain, ptg->idPemain1);
+    Pemain* p2 = hashCari(&hashTabelPemain, ptg->idPemain2);
+    if (!p1 || !p2) {
+        cout << "ID pemain tidak valid.\n";
+        delete ptg;
+        nextIdPertandingan--;
+        return;
+    }
+    if (p1->idKlub == p2->idKlub) {
+        cout << "Pemain harus dari klub berbeda.\n";
+        delete ptg;
+        nextIdPertandingan--;
+        return;
+    }
+    ptg->idKlub1 = p1->idKlub;
+    ptg->idKlub2 = p2->idKlub;
+    ptg->hasil = 0;
+    tambahPertandinganBelakang(&daftarPertandingan, ptg);
+    enqueue(&antrianPertandingan, ptg);
+    cout << "Jadwal berhasil dibuat. ID Pertandingan: " << ptg->id << endl;
+}
+
+void lihatJadwal() {
+    if (daftarPertandingan.ukuran == 0) {
+        cout << "Belum ada jadwal.\n";
+        return;
+    }
+    cout << "\n===== JADWAL PERTANDINGAN =====\n";
+    NodePertandingan* cur = daftarPertandingan.kepala;
+    while (cur) {
+        cetakPertandingan(cur->data);
+        cur = cur->next;
+    }
+}
+
+void hapusJadwal() {
+    lihatJadwal();
+    if (daftarPertandingan.ukuran == 0) return;
+    int id;
+    cout << "ID pertandingan yang akan dihapus: ";
+    cin >> id;
+    hapusPertandinganById(&daftarPertandingan, id);
+    cout << "Jadwal berhasil dihapus.\n";
+}
+
+void inputHasil() {
+    if (queueKosong(&antrianPertandingan)) {
+        cout << "Tidak ada pertandingan dalam antrian.\n";
+        return;
+    }
+    Pertandingan* m = dequeue(&antrianPertandingan);
+    cout << "Memainkan pertandingan ID " << m->id << " : " << m->idPemain1 << " vs " << m->idPemain2 << endl;
+    cout << "Hasil (1: P1 menang, 2: P2 menang, 3: Seri): ";
+    int res;
+    cin >> res;
+    if (res < 1 || res > 3) {
+        cout << "Hasil tidak valid. Pertandingan dikembalikan ke antrian.\n";
+        enqueue(&antrianPertandingan, m);
+        return;
+    }
+    m->hasil = res;
+    Pemain* p1 = hashCari(&hashTabelPemain, m->idPemain1);
+    Pemain* p2 = hashCari(&hashTabelPemain, m->idPemain2);
+    if (res == 1) p1->skor += 1;
+    else if (res == 2) p2->skor += 1;
+    else { p1->skor += 1; p2->skor += 1; }
+    perbaruiTotalPoinKlub(p1->idKlub);
+    perbaruiTotalPoinKlub(p2->idKlub);
+    graphTambahSisi(&graphKlub, p1->idKlub, p2->idKlub);
+    pushStack(&riwayatPertandingan, m);
+    cout << "Hasil pertandingan dicatat.\n";
+}
+
+void lihatHasil() {
+    if (daftarPertandingan.ukuran == 0) {
+        cout << "Belum ada pertandingan.\n";
+        return;
+    }
+    cout << "\n===== HASIL PERTANDINGAN =====\n";
+    NodePertandingan* cur = daftarPertandingan.kepala;
+    while (cur) {
+        if (cur->data->hasil != 0)
+            cetakPertandingan(cur->data);
+        cur = cur->next;
+    }
+}
+
+void undoHasil() {
+    if (stackKosong(&riwayatPertandingan)) {
+        cout << "Tidak ada riwayat.\n";
+        return;
+    }
+    Pertandingan* m = popStack(&riwayatPertandingan);
+    Pemain* p1 = hashCari(&hashTabelPemain, m->idPemain1);
+    Pemain* p2 = hashCari(&hashTabelPemain, m->idPemain2);
+    if (m->hasil == 1) p1->skor -= 1;
+    else if (m->hasil == 2) p2->skor -= 1;
+    else if (m->hasil == 3) { p1->skor -= 1; p2->skor -= 1; }
+    perbaruiTotalPoinKlub(p1->idKlub);
+    perbaruiTotalPoinKlub(p2->idKlub);
+    m->hasil = 0;
+    enqueue(&antrianPertandingan, m);
+    cout << "Hasil di-undo.\n";
+}
+
+void rankingPemain() {
+    if (daftarPemain.ukuran == 0) {
+        cout << "Tidak ada pemain.\n";
+        return;
+    }
+    Pemain** arr = new Pemain*[daftarPemain.ukuran];
+    int idx = 0;
+    NodePemain* cur = daftarPemain.kepala;
+    while (cur) {
+        arr[idx++] = cur->data;
+        cur = cur->next;
+    }
+    quickSortPemain(arr, 0, daftarPemain.ukuran-1);
+    cout << "\n===== RANKING PEMAIN (berdasarkan skor) =====\n";
+    for (int i = 0; i < daftarPemain.ukuran; i++) {
+        cout << (i+1) << ". ";
+        cetakPemain(arr[i]);
+    }
+    delete[] arr;
+}
+
+void statistikTurnamen() {
+    cout << "\n===== STATISTIK TURNAMEN =====\n";
+    cout << "Total Klub: " << daftarKlub.ukuran << endl;
+    cout << "Total Pemain: " << daftarPemain.ukuran << endl;
+    int selesai = 0;
+    NodePertandingan* cur = daftarPertandingan.kepala;
+    while (cur) {
+        if (cur->data->hasil != 0) selesai++;
+        cur = cur->next;
+    }
+    cout << "Pertandingan selesai: " << selesai << endl;
+    cout << "Antrian pertandingan: " << getUkuranQueue(&antrianPertandingan) << endl;
+    if (daftarPemain.ukuran > 0) {
+        int totalRating = 0;
+        NodePemain* curP = daftarPemain.kepala;
+        while (curP) {
+            totalRating += curP->data->rating;
+            curP = curP->next;
+        }
+        double rata = (double)totalRating / daftarPemain.ukuran;
+        cout << "Rata-rata rating pemain: " << rata << endl;
+    }
+    cout << "Kedalaman BST (rekursif): " << bstKedalamanMaksRekursif(bstAkar) << endl;
+    cout << "\nKomponen terhubung antar klub (Graph):\n";
+    graphKomponenTerhubung(&graphKlub, cetakNamaKlub);
+}
+
+void lihatPeserta() {
+    cout << "\n===== DAFTAR PESERTA TURNAMEN =====\n";
+    if (daftarPemain.ukuran == 0) {
+        cout << "Belum ada peserta.\n";
+        return;
+    }
+    NodePemain* cur = daftarPemain.kepala;
+    while (cur) {
+        cout << "ID: " << cur->data->id << ", Nama: " << cur->data->nama << ", Klub: ";
+        Klub* k = nullptr;
+        NodeKlub* curK = daftarKlub.kepala;
+        while (curK) {
+            if (curK->data->id == cur->data->idKlub) { k = curK->data; break; }
+            curK = curK->next;
+        }
+        if (k) cout << k->nama;
+        else cout << "Unknown";
+        cout << ", Rating: " << cur->data->rating << endl;
+        cur = cur->next;
+    }
+}
+
+bool loginAdmin() {
+    const char* passwordBenar = "admin123";
+    char inputPassword[20];
+    int percobaan = 0;
+    const int maksPercobaan = 3;
+    
+    cout << "\n+======================================+\n";
+    cout << "|         LOGIN ADMIN                  |\n";
+    cout << "+======================================+\n";
+    while (percobaan < maksPercobaan) {
+        cout << "Masukkan password admin: ";
+        cin >> inputPassword;
+        if (bandingString(inputPassword, passwordBenar)) {
+            cout << "\n Login berhasil! Selamat datang, Admin.\n";
+            return true;
+        } else {
+            percobaan++;
+            cout << "[!] Password salah. Sisa percobaan: " << (maksPercobaan - percobaan) << endl;
+        }
+    }
+    cout << "\n[!] Terlalu banyak percobaan. Kembali ke menu utama.\n";
+    return false;
+}
+
+void menuAdmin() {
+    int p;
+    do {
+        cout << "\n========================================\n";
+        cout << "         MENU ADMIN (Full Akses)\n";
+        cout << "========================================\n";
+        cout << "1. Data Klub (Tambah/Edit/Hapus/Lihat)\n";
+        cout << "2. Data Pemain (Tambah/Edit/Hapus/Lihat)\n";
+        cout << "3. Daftar Peserta (Lihat)\n";
+        cout << "4. Jadwal Pertandingan (Buat/Hapus/Lihat)\n";
+        cout << "5. Hasil Pertandingan (Input/Undo/Lihat)\n";
+        cout << "6. Ranking Pemain (Lihat)\n";
+        cout << "7. Statistik Turnamen\n";
+        cout << "0. Logout\n";
+        cout << "Pilihan: ";
+        cin >> p;
+        switch(p) {
+            case 1: {
+                int sub;
+                do {
+                    cout << "\n--- DATA KLUB ---\n";
+                    cout << "1. Tambah Klub\n2. Edit Klub\n3. Hapus Klub\n4. Lihat Klub\n0. Kembali\nPilih: ";
+                    cin >> sub;
+                    if (sub == 1) tambahKlub();
+                    else if (sub == 2) editKlub();
+                    else if (sub == 3) hapusKlub();
+                    else if (sub == 4) lihatKlub();
+                } while (sub != 0);
+                break;
+            }
+            case 2: {
+                int sub;
+                do {
+                    cout << "\n--- DATA PEMAIN ---\n";
+                    cout << "1. Tambah Pemain\n2. Edit Pemain\n3. Hapus Pemain\n4. Lihat Pemain\n0. Kembali\nPilih: ";
+                    cin >> sub;
+                    if (sub == 1) tambahPemain();
+                    else if (sub == 2) editPemain();
+                    else if (sub == 3) hapusPemain();
+                    else if (sub == 4) lihatPemain();
+                } while (sub != 0);
+                break;
+            }
+            case 3: {
+                lihatPeserta();
+                break;
+            }
+            case 4: {
+                int sub;
+                do {
+                    cout << "\n--- JADWAL PERTANDINGAN ---\n";
+                    cout << "1. Buat Jadwal Baru\n2. Hapus Jadwal\n3. Lihat Semua Jadwal\n0. Kembali\nPilih: ";
+                    cin >> sub;
+                    if (sub == 1) buatJadwal();
+                    else if (sub == 2) hapusJadwal();
+                    else if (sub == 3) lihatJadwal();
+                } while (sub != 0);
+                break;
+            }
+            case 5: {
+                int sub;
+                do {
+                    cout << "\n--- HASIL PERTANDINGAN ---\n";
+                    cout << "1. Input Hasil\n2. Undo Hasil Terakhir\n3. Lihat Hasil\n0. Kembali\nPilih: ";
+                    cin >> sub;
+                    if (sub == 1) inputHasil();
+                    else if (sub == 2) undoHasil();
+                    else if (sub == 3) lihatHasil();
+                } while (sub != 0);
+                break;
+            }
+            case 6: rankingPemain(); break;
+            case 7: statistikTurnamen(); break;
+            case 0: cout << "Logout berhasil.\n"; break;
+            default: cout << "Pilihan tidak valid.\n";
+        }
+    } while (p != 0);
+}
+
+void menuUser() {
+    int p;
+    do {
+        cout << "\n========================================\n";
+        cout << "         MENU USER (Read Only)\n";
+        cout << "========================================\n";
+        cout << "1. Lihat Data Klub\n";
+        cout << "2. Lihat Daftar Peserta\n";
+        cout << "3. Lihat Jadwal Pertandingan\n";
+        cout << "4. Lihat Hasil Pertandingan\n";
+        cout << "5. Lihat Ranking Pemain\n";
+        cout << "6. Lihat Statistik Turnamen\n";
+        cout << "0. Logout\n";
+        cout << "Pilihan: ";
+        cin >> p;
+        switch(p) {
+            case 1: lihatKlub(); break;
+            case 2: lihatPeserta(); break;
+            case 3: lihatJadwal(); break;
+            case 4: lihatHasil(); break;
+            case 5: rankingPemain(); break;
+            case 6: statistikTurnamen(); break;
+            case 0: cout << "Logout berhasil.\n"; break;
+            default: cout << "Pilihan tidak valid.\n";
+        }
+    } while (p != 0);
+}
+
+int main() {
+    initListKlub(&daftarKlub);
+    initListPemain(&daftarPemain);
+    initListPertandingan(&daftarPertandingan);
+    initHashTable(&hashTabelPemain);
+    initGraph(&graphKlub);
+    initStack(&riwayatPertandingan);
+    initQueue(&antrianPertandingan);
+    bstAkar = nullptr;
+    
+    int pilihan;
+    do {
+        cout << "\n========================================\n";
+        cout << "   SISTEM MANAJEMEN TURNAMEN CATUR\n";
+        cout << "========================================\n";
+        cout << "1. Login Admin\n";
+        cout << "2. Login User\n";
+        cout << "0. Keluar\n";
+        cout << "Pilihan: ";
+        cin >> pilihan;
+        switch(pilihan) {
+            case 1:
+                if (loginAdmin()) {
+                    menuAdmin();
+                }
+                break;
+            case 2:
+                cout << "\nLogin sebagai User.\n";
+                menuUser();
+                break;
+            case 0:
+                cout << "Terima kasih telah menggunakan program.\n";
+                break;
+            default:
+                cout << "Pilihan tidak valid.\n";
+        }
+    } while (pilihan != 0);
+    
+    return 0;
+}
